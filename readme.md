@@ -1,5 +1,6 @@
 **todos**
 
+* do something about the way image is saved
 * text input boxes shows after user upload images (add animations too)
 * add shadow effect after image gets loaded
 * drag and drop feature
