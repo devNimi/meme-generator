@@ -1,0 +1,40 @@
+.canvas-main {
+  margin: 0.3em;
+}
+
+.canvas-main h2 {
+  margin: 10px 0 16px;
+}
+.image-container {
+  background-color: grey;
+  width: 100%;
+}
+#canvas {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+}
+.user-upload {
+  margin: 15px 0;
+}
+.user-file {
+  visibility: hidden;
+  position: absolute;
+}
+.user-text {
+  font-size: 18px;
+}
+
+#save-button {
+  margin: 0 0 15px 0;
+}
+
+#topLineText, #bottomLineText {
+  margin: 0.5em 0;
+}
+
+@media screen and (min-width: 768px) {
+  #save-button {
+    margin-top: 15px;
+  }
+}
