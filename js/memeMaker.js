@@ -17,29 +17,41 @@ function redrawMeme(image, topLine, bottomLine) {
   // Get Canvas2DContext
   var canvas = document.querySelector('canvas');
   var ctx = canvas.getContext("2d");
-  if(image != null) {
+  if(image !=+ null) {
+    // clear dropZone
+    clearDropZone();
     canvas.width = image.width;
     canvas.height = image.height;
     ctx.drawImage(image, 0, 0);
   }
-  ctx.font = "36pt Impact"
+  ctx.font = "36pt Impact";
   ctx.textAlign = "center";
-  ctx.strokeStyle = 'black'
+  ctx.strokeStyle = 'black';
   ctx.fillStyle = "white";
   ctx.lineWidth = 3;
 
-  if(topLine != null) {
+  if(topLine !== null) {
     ctx.fillText(topLine, (image.width/2) , (image.height/6));
     ctx.strokeText(topLine, (image.width/2) , (image.height/6));
   }
 
-  if(bottomLine!= null) {
+  if(bottomLine!== null) {
     ctx.fillText(bottomLine, (image.width/2) , (image.height/1.1));
     ctx.strokeText(bottomLine, (image.width/2) , (image.height/1.1));
   }
 
 }
 
+// when user upload or drag image, it clear space for canvas to draw itself on drop zone
+function clearDropZone() {
+  var canvasContainer = $('.canvas-container');
+  canvasContainer.css('padding', 'inherit');
+  canvasContainer.css('outline', 'inherit');
+  canvasContainer.css('background-color', 'inherit');
+  $('.drop-icon-container').css('display', 'none');
+  $('#canvas-container-file-label+label').css('display', 'none');
+
+}
 function saveFile() {
   window.open(document.querySelector('canvas').toDataURL());
 }
@@ -48,7 +60,8 @@ function saveFile() {
 function handleFileSelectInput(evt) {
   var files = evt.target.files;
   // although at last we are specifically passing files[0] to canvas, but this is for the case where even if user select multiple files, then also we'll only process image files
-  for (var i = 0; f = files[i]; i++) {
+  var i, f;
+  for (i = 0,f = files[i]; i < files.length; i++) {
     // Only process image files.
     if (!f.type.match('image.*')) {
       continue;
@@ -64,7 +77,8 @@ function handleFileSelectDnD(evt) {
   // http://stackoverflow.com/questions/16674963/event-originalevent-jquery
   var files= evt.originalEvent.dataTransfer.files; // FileList object
   // although at last we are specifically passing files[0] to canvas, but this is for the case where even if user select multiple files, then also we'll only process image files
-  for (var i = 0; f = files[i]; i++) {
+  var i, f;
+  for (i = 0,f = files[i]; i < files.length; i++) {
     // Only process image files.
     if (!f.type.match('image.*')) {
       continue;
@@ -85,9 +99,7 @@ function handleFileSelect(evt, files) {
     image.onload = function() {
       window.imageSrc = this;
       redrawMeme(window.imageSrc, '', '');
-      //removes background-color when user's image gets loaded
-      $('.image-container').css('background-color', 'inherit');
-    }
+    };
   // Set image data to background image.
   image.src = data;
   };
@@ -118,16 +130,36 @@ var input2 = document.getElementById('bottomLineText');
 input1.oninput = textChangeListener;
 input2.oninput = textChangeListener;
 
+// listen for user to upload or drag $ drop an image
 // document.getElementById('user-file').addEventListener('change', handleFileSelect, false);
-$('#user-file').change(handleFileSelectInput);
+$('.user-file').change(handleFileSelectInput);
 
-// Setup the drag and drop listeners.
-//traditional way
-// var dropZone = document.getElementById('drop-zone');
-// dropZone.addEventListener('dragover', handleDragOver, false);
-// dropZone.addEventListener('drop', handleFileSelectDnD, false);
-$('#drop-zone').on('dragover', handleDragOver);
-$('#drop-zone').on('drop', handleFileSelectDnD);
+if (Modernizr.draganddrop) {
+  // Browser supports HTML5 DnD.
+  // Setup the drag and drop listeners.
+  //traditional way
+  // var dropZone = document.getElementById('drop-zone');
+  // dropZone.addEventListener('dragover', handleDragOver, false);
+  // dropZone.addEventListener('drop', handleFileSelectDnD, false);
+  $('#drop-zone').on('dragover', handleDragOver);
+  $('#drop-zone').on('drop', handleFileSelectDnD);
+  // handles effects when files is dragged over
+  $('#drop-zone').on('dragover dragenter', function() {
+    $(this).addClass('on-drag');
+    $('.drop-icon').css('fill', '#bdbdbd');
+  });
+  $('#drop-zone').on('dragleave dragend drop', function() {
+    $(this).removeClass('on-drag');
+    $('.drop-icon').css('fill', '#B3E5FC');
+  });
+  // dropZone label
+  var dropZoneLabel = '<span class=""> or drag it here</span>.';
+  $('#canvas-container-file-label + label').append(dropZoneLabel);
+
+} else {
+  // Fallback to a library solution.
+}
+
 
 // document.getElementById('save-button').addEventListener('click', saveFile, false);
 $('#save-button').click(saveFile);
